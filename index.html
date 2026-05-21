@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>氣體壓縮與重返大氣層模擬 (優化版)</title>
+    <title>氣體壓縮與重返大氣層模擬 (科學專題版)</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -10,9 +11,10 @@
             color: #ffffff;
             margin: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            padding: 40px 20px;
         }
         .app-container {
             background-color: #1a1d24;
@@ -21,6 +23,7 @@
             padding: 30px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             border: 1px solid #2a2f3b;
+            margin-bottom: 40px;
         }
         .header {
             display: flex;
@@ -174,10 +177,86 @@
         .btn-reset:active {
             transform: scale(0.98);
         }
+
+        /* 科普文章專屬美化樣式 */
+        .article-container {
+            width: 960px;
+            background-color: #1a1d24;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            border: 1px solid #2a2f3b;
+            box-sizing: border-box;
+        }
+        .article-main-title {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-top: 0;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 20px;
+        }
+        .article-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .article-section-title::before {
+            content: "◆";
+            margin-right: 8px;
+            font-size: 14px;
+            color: #3b82f6;
+        }
+        .article-p {
+            font-size: 15px;
+            line-height: 1.75;
+            color: #cbd5e1;
+            margin-top: 0;
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+        .article-p strong {
+            color: #f8fafc;
+        }
+        .article-ul {
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        .article-li {
+            font-size: 15px;
+            line-height: 1.75;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            list-style-type: square;
+        }
+        .article-li strong {
+            color: #fb923c;
+        }
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #f3f4f6;
+            padding: 0 3px;
+        }
+        .formula sub {
+            font-style: normal;
+            font-size: 0.75em;
+        }
     </style>
 </head>
 <body>
 
+<!-- 互動模擬器區塊 -->
 <div class="app-container">
     <div class="header">
         <div class="title-section">
@@ -232,6 +311,74 @@
     </div>
 </div>
 
+<!-- 科普專題文章區塊 -->
+<div class="article-container">
+    <h1 class="article-main-title">太空中的「致命壓迫」：為什麼稀薄的大氣能燒毀流星？</h1>
+    
+    <p class="article-p">在夏夜裡看見流星劃過天際，或是觀看太空船重返地球的紀錄片時，我們總會從新聞主播或地科老師口中聽到這句話：「這是物體與大氣層劇烈『摩擦生熱』的結果。」</p>
+    
+    <p class="article-p">這個解釋行之有年，卻常常讓具有物理直覺的人感到困惑。因為在地球表面上方 80 到 120 公里的高空（即流星與太空船開始發光的「熱層」與「中階層」），大氣極為稀薄。那裡的氣壓大約只有地表的百萬分之一，氣體分子的密度低到在實驗室裡都會被歸類為「高真空」。</p>
+    
+    <p class="article-p">試想，將手放在近乎真空的容器裡揮動，你連微風都感受不到。既然如此，一塊隕石在如此空曠、氣體鬼魅般稀薄的高空中，究竟是怎麼「摩擦」出一具足以熔化鋼鐵、激發白熾光芒的數千度火球？</p>
+    
+    <p class="article-p">答案是：<strong>我們都被「摩擦」這個詞誤導了。流星與太空船重返大氣層時的極端高溫，九成以上不是來自摩擦力，而是來自氣體的「絕熱壓縮」。</strong></p>
+
+    <h2 class="article-section-title">氣體分子的「來不及閃避」</h2>
+    <p class="article-p">要理解這個現象，必須把視角切換到「極音速（Hypersonic）」的極端領域。</p>
+    <p class="article-p">當太空船從軌道重返地球，或者是流星體從外太空闖入時，它們的移動速度快得超乎想像。太空船的重返速度大約是 25 倍音速（約每秒 7.5 公里），而隕石的入境速度更可高達每秒 11 到 72 公里。</p>
+    <p class="article-p">在這樣的驚人速度下，固然氣體分子彼此間的距離很遠（密度低），但對於高速前進的隕石來說，它前方的空氣分子根本「來不及閃開」。物體移動的速度，遠遠超越了空氣分子互相推擠、傳遞壓力訊號的聲速。</p>
+    <p class="article-p">結果，隕石前端的空氣分子像是一面被瘋狂向前推進的實體牆壁。物體在極短的時間內，將大量的空氣分子強行禁錮在自己的前方。這種大氣分子在極短時間內密度暴增、空間被極度擠壓的現象，在流體力學中被稱為強烈的<strong>衝壓（Ram Pressure）</strong>。</p>
+
+    <h2 class="article-section-title">打氣筒的終極放大版</h2>
+    <p class="article-p">當氣體被強行壓縮時，會發生什麼事？這就是中學物理課本中的熱力學第一定律。</p>
+    <p class="article-p">當你用手去摸剛打完氣的腳踏車打氣筒，會發現筒身微微發熱，這是因為你對筒內的空氣施加了外力做功，氣體體積縮小，分子的熱運動（動能）劇烈加劇，導致溫度上升。因為這個壓縮過程極快，熱量來不及向外擴散，物理學上稱為「絕熱壓縮（Adiabatic Compression）」工。</p>
+    <p class="article-p">現在，想像一下將這個腳踏車打氣筒的壓縮速度放大幾萬倍。</p>
+    <p class="article-p">當太空船或流星以馬赫 25 的速度撞擊大氣時，它前端的氣體在微秒等級的時間內被壓縮了數百倍。這個強烈的壓縮波在物體前方形成了一道弓形震波（Bow Shock）。在震波後方、正對著物體前緣的中心點，被稱為「停滯點（Stagnation Point）」。</p>
+    <p class="article-p">在停滯點上，大氣分子相對於物體的速度被迫降為零。這意味著，這些氣體原本巨大的宏觀動能，在瞬間百分之百轉化成了微觀的分子熱動能。根據理想氣體公式與震波理論計算，停滯點的氣體溫度會在瞬間飆升至 5,000°C 到 11,000°C 以上——這比太陽表面的溫度還要高。</p>
+    <p class="article-p">此時的大氣分子已經不只是受熱而已，高溫撕裂了氮氣與氧氣分子的化學鍵，使它們解離成原子，甚至剝離了電子，形成了一團由離子與自由電子組著的白熾白光外殼——電漿（Plasma）。這正是流星發光、以及太空船重返大氣層時會遭遇「無線電通訊黑障」的真正原因。</p>
+
+    <h2 class="article-section-title">熱力學的化學魔術：為什麼不是 15,000 °C？</h2>
+    <p class="article-p">如果我們直接套用中學課本裡的「理想氣體公式」來計算，當速度達到馬赫 25 時，物體前端的理論溫度應該會隨著速度平方一路飆升，輕鬆突破 15,000 °C。然而，在真實世界的航太觀測中，太空船表面的燃氣溫度通常會被壓制在 5,500 °C 到 8,000 °C 之間（例如在馬赫 25 時大約為 5,800 °C）。</p>
+    <p class="article-p">這消失的一萬度去哪了？這引出了高超音速流體力學中最迷人的核心——<strong>真實氣體效應（Real Gas Effects）</strong>。</p>
+    <p class="article-p">真實世界的空氣分子（氧氣 <span class="formula">O<sub>2</sub></span> 與氮氣 <span class="formula">N<sub>2</sub></span>）並不是完美的剛性硬球。當絕熱壓縮使溫度超過 2,000 °C 時，強烈的撞擊會硬生生撕裂氧氣分子的化學鍵，使其解離（Dissociation）成獨立的氧原子；當溫度超過 4,000 °C 時，地表最穩定的氮氣分子也開始瘋狂解離；隨著溫度繼續攀升，原子外層的電子甚至會被剝離，形成電離（Ionization）。</p>
+    <p class="article-p">分子的解離與電離，是極其強烈的「吸熱反應」。</p>
+    <p class="article-p">原本應該讓溫度繼續飆升的巨大動能，在極高溫下被大氣分子自發性地拿去當作「化學鍵斷裂與電子剝離」的能量強行吸收了。這群空氣分子在太空船前方充當了天然的「吸熱緩衝墊」，將高空燃氣溫度死死鎖在 5,800 °C 左右。雖然溫度被化學反應「踩了煞車」，但這也讓空氣化為了電漿（Plasma）。</p>
+
+    <h2 class="article-section-title">為什麼低密度不會讓溫度變低？</h2>
+    <p class="article-p">回到一開始的疑問：既然大氣密度那麼低，為什麼還能產生這麼高的溫度？</p>
+    <p class="article-p">這裡我們需要釐清兩個不同的熱力學概念：「溫度（Temperature）」與「熱通量（Heat Flux）」。</p>
+    <p class="article-ul">
+        <li class="article-li"><strong>溫度</strong>決定了單個分子的平均動能。不論大氣多稀薄，只要壓縮的比例和相對速度夠高，被困住的單個氣體分子的運動速度就會極快，轉化出來的氣體溫度就必然極高。</li>
+        <li class="article-li"><strong>熱通量</strong>則是每秒鐘有多少熱能真正傳遞到太空船的外殼上。這就與大氣密度密切相關了。在高空（如 100 公里高），雖然大氣被壓縮出的電漿溫度高達數千度，但因為分子總數太少，它們撞擊太空船外殼所能傳遞的總能量（熱通量）其實很有限。</li>
+    </p>
+    <p class="article-p">這就是為什麼太空船在 100 公里高空時雖然前端已經形成火球（高溫），但船體外殼此時還不會被熔毀。真正的耐熱大考驗，通常發生在太空船降落到 60 至 40 公里高空時——那裡的空氣密度開始增加，停滯點的氣體依然維持極高溫，而大量的氣體分子開始將龐大的熱能排山倒海般傳導進太空船結構中。</p>
+
+    <h2 class="article-section-title">顛覆直覺的防禦：為什麼太空船要設計得「又圓又胖」？</h2>
+    <p class="article-p">最後，這項物理原理催生了航太史上最聰明的發明之一：<strong>鈍頭體理論（Blunt Body Theory）</strong>。</p>
+    <p class="article-p">早期的飛彈工程師直覺地認為，要重返大氣層的物體應該像子彈或戰鬥機一樣，設計得尖尖的，才能減少阻力。但結果卻是尖頭飛彈在重返時全數燒毀。為什麼？因為尖銳的前端會讓高溫的震波直接貼在外殼上，數千度的熱量會毫無阻礙地透過「傳導」熔化外殼。</p>
+    <p class="article-p">1951 年，NACA（NASA 的前身）科學家哈利·朱利安·艾倫（Harry Julian Allen）提出了一個顛覆性的思維：把太空艙前端設計成一個巨大的圓弧鈍面。</p>
+    <p class="article-p">當這個寬大的鈍面撞擊空氣時，會形成一道脫離的弓形震波（Bow Shock），它會把大量的氣體推在前面，形成一個厚厚的空氣墊，與太空船表面保持安全距離。如此一來，絕熱壓縮產生的極端高溫只會留在震波表層，而絕大多數的超高熱氣流會順著這個空氣墊往太空艙兩側滑過、排向後方。真正接觸到太空船表面的，只剩下輻射熱與一小部分傳導熱。太空船利用了空氣本身的壓縮屏障，成功把九成以上的毀滅性熱能拒之門外。</p>
+    <p class="article-p">當我們再次仰望夜空中的流星，我們所看到的並非岩石與大氣頑強摩擦的火花，而是大氣分子在高超音速的壓迫下，不甘屈服、瞬間釋放所有動能所點燃的宇宙禮花。</p>
+
+    <h2 class="article-section-title">實驗室時間：重返大氣層互動式物理模擬導覽</h2>
+    <p class="article-p">為了解開這個顛覆直覺的物理謎團，我們將上述複雜的空氣動力學公式與化學效應，濃縮進這個網頁互動式模擬器中。透過這個視覺化風洞，你可以親自操作變數，觀察高空大氣的微觀變化。</p>
+    <p class="article-p">最上方的儀表板會即時顯示四項關鍵數據：</p>
+    <p class="article-ul">
+        <li class="article-li"><strong>衝壓氣體溫度 (Stagnation Temperature)：</strong> 模擬器完美還原了「真實氣體效應」。當你把速度從馬赫 1 逐步拉高到馬赫 5 時，溫度會呈現陡峭的平方增長；然而，一旦超越馬赫 5 的極音速臨界點，內建算法會模擬大氣分子的化學解離吸熱反應，使溫度曲線放緩。這就是為什麼當你將速度拉到極限的馬赫 25 時，模擬溫度會精準停留在符合物理實測的 5,800 °C 上下，而非不切實際的萬度高溫。</li>
+        <li class="article-li"><strong>停滯點壓力 (Ram Pressure)：</strong> 顯示飛行器正前方燃氣被迫停滯、動能化為壓力能的實質強度。它會隨著大氣密度與速度平方（<span class="formula">M<sup>2</sup></span>）同步激增。</li>
+        <li class="article-li"><strong>模擬熱通量 (Heat Flux)：</strong> 這是本模擬器的精華指標。採用了航太工程著名的高超音速近似公式（<span class="formula">q ∝ 	&radic;ho &middot; V<sup>3</sup></span>）。它能幫你解開低密度高溫的悖論：試著保持馬赫 25 不變，將環境大氣密度調低，你會發現前端的氣體溫度依然極高，但熱通量數據會顯著暴跌——這生動地證明了高空稀薄大氣中，因為分子太少而無法有效傳熱給飛船的真實物理限制。</li>
+        <li class="article-li"><strong>氣流狀態與動態描述：</strong> 依記台灣標準航太名詞與物理分界即時變更：
+            <div style="margin-top: 10px; padding-left: 15px;">
+                • <strong>馬赫 < 5「超音速流動」</strong>：氣流形成波紋，平順地從兩側逸散。<br>
+                • <strong>馬赫 5 ～ 12「極音速震波」</strong>：進入極音速分水嶺，前方大氣分子來不及避開，劇烈絕熱壓縮並形成強烈的脫離弓形震波。<br>
+                • <strong>馬赫 12 ～ 25「極音速電漿態」</strong>：溫度飆破數千度，分子鍵結斷裂解離，在畫布上催生出一團紅熾與白熾交織的阻絕電漿火球。
+            </div>
+        </li>
+    </p>
+    <p class="article-p">在畫布區域，你可以開啟「顯示壓力向量」開關。開啟後，飛船正面會拉出紅色的壓力向量箭頭。箭頭的長度隨衝壓壓力動態伸縮，生動展現出動能轉化為高壓牆的物理壓迫感。 畫面中的無數微觀粒子，則模擬了源源不絕湧入的大氣分子。它們在遠處呈現代表低溫環境的藍色，一旦撞擊模擬器內建的「弓形震波（BOW SHOCK）」虛線邊界，流速便會瞬間暴跌（動能轉換），顏色急遽轉為黃色、橘紅色，最終在正前方的「停滯點（STAGNATION POINT）」匯聚成代表白熾電漿的純白色。 當你親手將速度與密度拉滿，看著畫布上被推開的脫離激波、動態分流的粒子屏障，以及儀表板上被鎖定在 5,800 °C 的熱力學數據時，你將不再只是閱讀文字，而是用流體力學的直覺，見證一場宇宙級的動能與熱能轉換史詩。</p>
+</div>
+
+<!-- 模擬器腳本 JavaScript 核心代碼 -->
 <script>
     const canvas = document.getElementById('simCanvas');
     const ctx = canvas.getContext('2d');
@@ -257,135 +404,109 @@
     let particles = [];
     const MAX_PARTICLES = 400;
 
-    // 飛行器本體設定 (鈍頭體設計)
+    // 飛行器本體設定 (航太鈍頭體設計)
     const ship = {
-        x: 400,       // 核心中心 X
-        y: 210,       // 核心中心 Y
-        radius: 75,   // 前端鈍角半徑
-        length: 140,  // 總長度
+        x: 400,       
+        y: 210,       
+        radius: 75,   
+        length: 140,  
     };
 
-    // 改良的空氣動力學公式計算
+    // 空氣動力學數據公式計算
     function updateStats() {
-        // 1. 停滯點溫度 (Stagnation Temperature)
-        // 考慮高超音速下的「實質氣體效應」(解離與電離吸熱)，溫度在低速時呈平方增長，高速時趨緩
+        // 1. 停滯點溫度 (Stagnation Temperature) —— 考慮化學解離熱吸能效應
         let temp = 25; 
         if (mach <= 5) {
             temp += Math.floor(mach * mach * 55); 
         } else {
-            // 超過馬赫 5 後，分子解離吸收大量能量，氣體溫度增長曲線放緩，但依舊極高
             temp += Math.floor(5 * 5 * 55 + (mach - 5) * 220); 
         }
         
-        // 2. 停滯點衝壓壓力 (Ram Pressure) P = \gamma * P_inf * M^2 (高超音速近似)
-        // 壓力與環境密度、速度平方成正比
+        // 2. 衝壓壓力 P
         let pressure = (density * (mach * mach) * 1.2).toFixed(1);
 
-        // 3. 熱通量 (Heat Flux) - 根據 Chapman-King / Detra-Hidalgo 近似公式：q \propto \sqrt{\rho} * V^3
-        // 這完美解釋了：為什麼高空大氣密度極低時，雖然氣體溫度極高，但飛船外殼卻不會馬上燒毀（因為熱通量低）
+        // 3. 模擬熱通量 (Chapman-King 高超音速近似)
         let heatFlux = (Math.sqrt(density) * Math.pow(mach, 3) * 0.015).toFixed(2);
 
-        // 更新 UI 數據面版
         valTemp.innerText = `${temp.toLocaleString()} °C`;
         valPressure.innerText = `${pressure} kPa`;
         valHeatFlux.innerText = `${heatFlux} MW/m²`;
 
-        // 依據馬赫數判定流體狀態與動態文字描述（遵循台灣航太標準名詞）
+        // 依據馬赫數判定流體狀態與文字（遵循台灣航太名詞定義）
         if (mach < 5) {
             valState.innerText = "超音速流動";
-            valState.style.color = "#3b82f6"; // 藍
+            valState.style.color = "#3b82f6";
             valTemp.style.color = "#60a5fa";
             statusDesc.innerText = "流速已超越音速，前方氣體壓縮並形成激波。氣流順著鈍頭體表面分流向後逸散。";
         } else if (mach < 12) {
             valState.innerText = "極音速震波";
-            valState.style.color = "#f97316"; // 橘
+            valState.style.color = "#f97316";
             valTemp.style.color = "#fb923c";
-            statusDesc.innerText = "進入極音速（Mach 5+）領域！前方大氣分子來不及避開，遭到劇烈絕熱壓縮，形成強烈的脫離弓形震波。";
+            statusDesc.innerText = "進入極音速領域！前方大氣分子來不及避開，遭到劇烈絕熱壓縮，形成強烈的脫離弓形震波。";
         } else {
             valState.innerText = "極音速電漿態";
-            valState.style.color = "#ef4444"; // 紅
+            valState.style.color = "#ef4444";
             valTemp.style.color = "#f87171";
-            statusDesc.innerText = "速度極高（Mach 12+），劇烈壓縮產生數千度高溫。大氣分子鍵結斷裂並電離，在表面形成阻絕通訊的電漿火球！";
+            statusDesc.innerText = "速度極高，劇烈壓縮產生數千度高溫。大氣分子鍵結斷裂並電離，在表面形成阻絕通訊的電漿火球！";
         }
     }
 
-    // 粒子類別 (模擬從右側源源不絕湧入的大氣分子)
+    // 模擬氣體分子微觀粒子類別
     class Particle {
         constructor() {
             this.reset(true);
         }
 
         reset(randomizeX = false) {
-            // 初始化位置
             this.x = randomizeX ? Math.random() * canvas.width : canvas.width + Math.random() * 50;
             this.y = Math.random() * canvas.height;
-            
-            // 基礎速度 (水平向左偏振)
             this.baseVx = -(mach * 1.5 + 3);
             this.vx = this.baseVx;
             this.vy = (Math.random() - 0.5) * 0.4;
-            
-            this.temp = 0;       // 局部受壓升溫係數 (0 ~ 1)
-            this.isBypassed = false; // 是否已經成功繞過機鼻
+            this.temp = 0;       
+            this.isBypassed = false; 
             this.size = Math.random() * 1.8 + 1.2;
         }
 
         update() {
-            // 預期流體交互作用中心 (將其設在圓弧形機鼻內部稍微靠左，能拉出極佳的流線弧度)
             let coreX = ship.x - 10;
             let coreY = ship.y;
-            
             let dx = this.x - coreX;
             let dy = this.y - coreY;
             let dist = Math.sqrt(dx * dx + dy * dy);
 
-            // 動態震波影響範圍 (速度越快，震波越貼近船體表面)
             let shockRadius = ship.radius + 75 - (mach * 1.8);
             if (shockRadius < ship.radius + 15) shockRadius = ship.radius + 15;
 
-            // 完美的粒子分流與流場壓縮邏輯
             if (this.x > ship.x - 30) { 
-                // 1. 進入震波區：減速並受壓升溫
                 if (dist < shockRadius && dist > ship.radius) {
                     let compressionFactor = (shockRadius - dist) / (shockRadius - ship.radius);
-                    
-                    // 順著弧度產生分流速度 (向量發散)
                     let angle = Math.atan2(dy, dx);
-                    
-                    // 前端強烈減速 (動能轉化為熱能的本質)
                     this.vx = this.baseVx * (1 - compressionFactor * 0.85);
-                    // 側向分流加速
                     this.vy += Math.sin(angle) * (mach * 0.4) * compressionFactor;
-                    
                     this.temp = compressionFactor;
-                } 
-                // 2. 離開震波外圍或進入後方：流速逐漸恢復正常
-                else if (dist >= shockRadius) {
+                } else if (dist >= shockRadius) {
                     this.vx = this.vx * 0.95 + this.baseVx * 0.05;
                     this.temp *= 0.85; 
                 }
             } else {
-                // 已越過機鼻前緣，順著艙體兩側平行向後噴洩
                 this.isBypassed = true;
-                this.vx = this.baseVx * 1.2; // 兩側流速因通道變窄而局部加快 (白努利效應模擬)
-                this.temp *= 0.9;            // 膨脹降溫
+                this.vx = this.baseVx * 1.2; 
+                this.temp *= 0.9;            
             }
 
-            // 3. 邊界剛性防穿透防禦 (當粒子與鈍頭體外殼撞擊時)
             if (dist <= ship.radius && this.x >= ship.x - 10) {
                 let angle = Math.atan2(dy, dx);
                 this.x = coreX + Math.cos(angle) * (ship.radius + 2);
                 this.y = coreY + Math.sin(angle) * (ship.radius + 2);
                 this.vy = Math.sin(angle) * (mach * 1.2);
-                this.vx = this.baseVx * 0.1; // 撞擊停滯點附近速度驟降
+                this.vx = this.baseVx * 0.1; 
                 this.temp = 1.0;
             }
 
-            // 進度前進
             this.x += this.vx;
             this.y += this.vy;
 
-            // 超出畫布邊界，至右側重置循環
             if (this.x < 0 || this.y < 0 || this.y > canvas.height) {
                 this.reset();
             }
@@ -395,36 +516,32 @@
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             
-            // 精緻的熱力學色彩映射 (冷流藍 -> 壓縮黃 -> 高熱橘紅 -> 電漿白)
             if (this.temp < 0.15) {
-                ctx.fillStyle = `rgba(59, 130, 246, ${0.25 + density * 0.5})`; // 稀薄大氣原色
+                ctx.fillStyle = `rgba(59, 130, 246, ${0.25 + density * 0.5})`; 
             } else if (this.temp < 0.5) {
-                ctx.fillStyle = `rgba(245, 158, 11, ${0.7 + density * 0.3})`; // 開始受壓
+                ctx.fillStyle = `rgba(245, 158, 11, ${0.7 + density * 0.3})`; 
             } else if (this.temp < 0.82) {
-                ctx.fillStyle = `rgba(239, 68, 68, 0.95)`;                    // 劇烈高溫
+                ctx.fillStyle = `rgba(239, 68, 68, 0.95)`;                    
             } else {
-                ctx.fillStyle = `rgba(255, 255, 255, 1)`;                      // 停滯點白熾電漿態
+                ctx.fillStyle = `rgba(255, 255, 255, 1)`;                      
                 if (mach > 12) {
                     ctx.shadowBlur = 6;
                     ctx.shadowColor = "#ef4444";
                 }
             }
             ctx.fill();
-            ctx.shadowBlur = 0; // 重置發光效果防止影響整體效能
+            ctx.shadowBlur = 0; 
         }
     }
 
-    // 初始化粒子陣列
     function initParticles() {
         particles = [];
-        // 動態控制作用中的粒子數，避免低密度時粒子過於擁擠
-        let currentCount = Math.floor(MAX_PARTICLES * (0.3 + density * 0.7));
-        for (let i = 0; i < currentCount; i++) {
+        let targetCount = Math.floor(MAX_PARTICLES * (0.3 + density * 0.7));
+        for (let i = 0; i < targetCount; i++) {
             particles.push(new Particle());
         }
     }
 
-    // 箭頭向量繪製函數
     function drawArrow(fromX, fromY, toX, toY) {
         let headlen = 7; 
         let dx = toX - fromX;
@@ -439,13 +556,10 @@
         ctx.stroke();
     }
 
-    // 繪製太空船艙、震波邊界與科學引線標籤
     function drawShipAndLabels() {
         let noseX = ship.x - 10;
         let noseY = ship.y;
         
-        // 1. 繪製高溫大氣對流包絡層 (Plasma Glow Layer)
-        // 隨馬赫數與密度增強的前端熱暈效果
         if (mach > 4) {
             let glowGrad = ctx.createRadialGradient(ship.x + 30, ship.y, ship.radius, ship.x + 40, ship.y, ship.radius + 50);
             glowGrad.addColorStop(0, `rgba(239, 68, 68, ${0.4 * density})`);
@@ -457,11 +571,8 @@
             ctx.fill();
         }
 
-        // 2. 繪製鈍頭體飛船 (Blunt Body Spaceship)
         ctx.beginPath();
-        // 前端寬大圓弧機鼻
         ctx.arc(noseX, noseY, ship.radius, -Math.PI / 2.4, Math.PI / 2.4, false);
-        // 後方收束機身
         ctx.lineTo(ship.x - ship.length, ship.y + 45);
         ctx.lineTo(ship.x - ship.length, ship.y - 45);
         ctx.closePath();
@@ -471,33 +582,28 @@
         ctx.fill();
         ctx.stroke();
         
-        // 飛船內艙耐熱板視覺分隔線
         ctx.beginPath();
         ctx.arc(noseX, noseY, ship.radius - 8, -Math.PI / 2.4, Math.PI / 2.4, false);
         ctx.strokeStyle = "#4c566a";
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // 飛船標誌符號
         ctx.fillStyle = "#eceff4";
         ctx.font = "18px sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("🛸", ship.x - 50, ship.y + 6);
 
-        // 3. 繪製離體弓形震波線 (Detached Bow Shockwave Line)
         let shockRadius = ship.radius + 75 - (mach * 1.8);
         if (shockRadius < ship.radius + 15) shockRadius = ship.radius + 15;
         
         ctx.beginPath();
         ctx.arc(noseX, noseY, shockRadius, -Math.PI / 2.1, Math.PI / 2.1);
-        // 震波線顏色隨強度改變
         ctx.strokeStyle = mach > 10 ? "rgba(239, 68, 68, 0.6)" : "rgba(148, 163, 184, 0.4)";
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 4]);
         ctx.stroke();
-        ctx.setLineDash([]); // 還原實線
+        ctx.setLineDash([]); 
 
-        // 4. 科學標籤與引線渲染
         ctx.fillStyle = "rgba(15, 17, 21, 0.85)";
         ctx.strokeStyle = "#475569";
         ctx.lineWidth = 1;
@@ -505,7 +611,6 @@
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        // 標籤 A: 弓形震波
         let lblAx = noseX + shockRadius + 40;
         let lblAy = noseY - 110;
         ctx.beginPath();
@@ -521,7 +626,6 @@
         ctx.fillStyle = "#cbd5e1";
         ctx.fillText("弓形震波 (BOW SHOCK)", lblAx, lblAy);
 
-        // 標籤 B: 停滯點 (最高溫高壓轉化核心區)
         let lblBx = noseX + ship.radius + 70;
         let lblBy = noseY + 40;
         ctx.beginPath();
@@ -537,11 +641,9 @@
         ctx.fillStyle = "#f87171";
         ctx.fillText("停滯點 (STAGATION POINT)", lblBx, lblBy);
 
-        // 5. 繪製壓力場向量結構 (開啟時顯示)
         if (showVectors) {
             ctx.strokeStyle = "rgba(239, 68, 68, 0.8)";
             ctx.lineWidth = 1.5;
-            // 向量長度取決於動態衝壓強度
             let vecLength = Math.min(mach * density * 8, 90); 
             
             for (let angle = -Math.PI / 3; angle <= Math.PI / 3; angle += Math.PI / 6) {
@@ -554,11 +656,9 @@
         }
     }
 
-    // 主循環動畫
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 依據控制項設定調整當前運作粒子數
         let targetCount = Math.floor(MAX_PARTICLES * (0.3 + density * 0.7));
         if (particles.length < targetCount) {
             particles.push(new Particle());
@@ -566,19 +666,16 @@
             particles.pop();
         }
 
-        // 粒子物理更新與渲染
         particles.forEach(p => {
             p.update();
             p.draw();
         });
 
-        // 覆蓋繪製船體與UI標示
         drawShipAndLabels();
-
         requestAnimationFrame(animate);
     }
 
-    // 事件監聽器設定
+    // 事件監聽器
     sMach.addEventListener('input', (e) => {
         mach = parseFloat(e.target.value);
         dMach.innerText = mach;
@@ -599,19 +696,15 @@
         sMach.value = 5;
         sDensity.value = 0.5;
         tVectors.checked = false;
-        
         mach = 5;
         density = 0.5;
         showVectors = false;
-        
         dMach.innerText = '5';
         dDensity.innerText = '0.50';
-        
         initParticles();
         updateStats();
     });
 
-    // 核心系統初始化啟動
     initParticles();
     updateStats();
     animate();

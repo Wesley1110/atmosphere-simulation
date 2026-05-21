@@ -1,0 +1,621 @@
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氣體壓縮與重返大氣層模擬 (優化版)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #0f1115;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            background-color: #1a1d24;
+            width: 960px;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid #2a2f3b;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #2a2f3b;
+            padding-bottom: 20px;
+        }
+        .title-section {
+            max-width: 50%;
+        }
+        .title-section h1 {
+            font-size: 22px;
+            margin: 0 0 8px 0;
+            color: #f8fafc;
+            letter-spacing: 0.5px;
+        }
+        .title-section p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.5;
+        }
+        .stats-section {
+            display: flex;
+            gap: 25px;
+        }
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            background-color: #111318;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #232834;
+            min-width: 110px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        canvas {
+            background-color: #090a0f;
+            border-radius: 10px;
+            width: 100%;
+            height: 420px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            border: 1px solid #232834;
+            display: block;
+        }
+        .controls-wrapper {
+            background-color: #111318;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #232834;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .control-label {
+            font-size: 13px;
+            color: #94a3b8;
+            min-width: 110px;
+        }
+        input[type="range"] {
+            width: 180px;
+            accent-color: #3b82f6;
+            cursor: pointer;
+        }
+        .value-display {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: monospace;
+            min-width: 40px;
+            text-align: center;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: .3s;
+            border-radius: 22px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        .btn-reset {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-reset:hover {
+            background-color: #dc2626;
+        }
+        .btn-reset:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="title-section">
+            <h1 id="main-title">氣體壓縮與重返大氣層物理模擬</h1>
+            <p id="status-desc">載入中...</p>
+        </div>
+        <div class="stats-section">
+            <div class="stat-box">
+                <div class="stat-label">衝壓氣體溫度</div>
+                <div id="val-temp" class="stat-value" style="color: #f97316;">-- °C</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">停滯點壓力</div>
+                <div id="val-pressure" class="stat-value" style="color: #ffffff;">-- kPa</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">模擬熱通量</div>
+                <div id="val-heatflux" class="stat-value" style="color: #ef4444;">-- MW/m²</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">氣流狀態</div>
+                <div id="val-state" class="stat-value" style="color: #3b82f6;">--</div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="simCanvas" width="900" height="420"></canvas>
+
+    <div class="controls-wrapper">
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-label">飛行速度 (Mach)</div>
+                <input type="range" id="slider-mach" min="1" max="25" value="5" step="1">
+                <div class="value-display" id="display-mach">5</div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">環境大氣密度</div>
+                <input type="range" id="slider-density" min="0.05" max="1.0" value="0.5" step="0.05">
+                <div class="value-display" id="display-density">0.50</div>
+            </div>
+        </div>
+        <div class="controls" style="margin-top: 15px; border-top: 1px solid #232834; padding-top: 15px;">
+            <div class="control-group">
+                <div class="control-label">顯示壓力向量</div>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-vectors">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="btn-reset" id="btn-reset">重置模擬參數</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI 元素
+    const sMach = document.getElementById('slider-mach');
+    const sDensity = document.getElementById('slider-density');
+    const dMach = document.getElementById('display-mach');
+    const dDensity = document.getElementById('display-density');
+    const tVectors = document.getElementById('toggle-vectors');
+    const btnReset = document.getElementById('btn-reset');
+    
+    const valTemp = document.getElementById('val-temp');
+    const valPressure = document.getElementById('val-pressure');
+    const valHeatFlux = document.getElementById('val-heatflux');
+    const valState = document.getElementById('val-state');
+    const statusDesc = document.getElementById('status-desc');
+
+    // 物理與狀態變數
+    let mach = parseFloat(sMach.value);
+    let density = parseFloat(sDensity.value);
+    let showVectors = tVectors.checked;
+    let particles = [];
+    const MAX_PARTICLES = 400;
+
+    // 飛行器本體設定 (鈍頭體設計)
+    const ship = {
+        x: 400,       // 核心中心 X
+        y: 210,       // 核心中心 Y
+        radius: 75,   // 前端鈍角半徑
+        length: 140,  // 總長度
+    };
+
+    // 改良的空氣動力學公式計算
+    function updateStats() {
+        // 1. 停滯點溫度 (Stagnation Temperature)
+        // 考慮高超音速下的「實質氣體效應」(解離與電離吸熱)，溫度在低速時呈平方增長，高速時趨緩
+        let temp = 25; 
+        if (mach <= 5) {
+            temp += Math.floor(mach * mach * 55); 
+        } else {
+            // 超過馬赫 5 後，分子解離吸收大量能量，氣體溫度增長曲線放緩，但依舊極高
+            temp += Math.floor(5 * 5 * 55 + (mach - 5) * 220); 
+        }
+        
+        // 2. 停滯點衝壓壓力 (Ram Pressure) P = \gamma * P_inf * M^2 (高超音速近似)
+        // 壓力與環境密度、速度平方成正比
+        let pressure = (density * (mach * mach) * 1.2).toFixed(1);
+
+        // 3. 熱通量 (Heat Flux) - 根據 Chapman-King / Detra-Hidalgo 近似公式：q \propto \sqrt{\rho} * V^3
+        // 這完美解釋了：為什麼高空大氣密度極低時，雖然氣體溫度極高，但飛船外殼卻不會馬上燒毀（因為熱通量低）
+        let heatFlux = (Math.sqrt(density) * Math.pow(mach, 3) * 0.015).toFixed(2);
+
+        // 更新 UI 數據面版
+        valTemp.innerText = `${temp.toLocaleString()} °C`;
+        valPressure.innerText = `${pressure} kPa`;
+        valHeatFlux.innerText = `${heatFlux} MW/m²`;
+
+        // 依據馬赫數判定流體狀態與動態文字描述（遵循台灣航太標準名詞）
+        if (mach < 5) {
+            valState.innerText = "超音速流動";
+            valState.style.color = "#3b82f6"; // 藍
+            valTemp.style.color = "#60a5fa";
+            statusDesc.innerText = "流速已超越音速，前方氣體壓縮並形成激波。氣流順著鈍頭體表面分流向後逸散。";
+        } else if (mach < 12) {
+            valState.innerText = "極音速震波";
+            valState.style.color = "#f97316"; // 橘
+            valTemp.style.color = "#fb923c";
+            statusDesc.innerText = "進入極音速（Mach 5+）領域！前方大氣分子來不及避開，遭到劇烈絕熱壓縮，形成強烈的脫離弓形震波。";
+        } else {
+            valState.innerText = "極音速電漿態";
+            valState.style.color = "#ef4444"; // 紅
+            valTemp.style.color = "#f87171";
+            statusDesc.innerText = "速度極高（Mach 12+），劇烈壓縮產生數千度高溫。大氣分子鍵結斷裂並電離，在表面形成阻絕通訊的電漿火球！";
+        }
+    }
+
+    // 粒子類別 (模擬從右側源源不絕湧入的大氣分子)
+    class Particle {
+        constructor() {
+            this.reset(true);
+        }
+
+        reset(randomizeX = false) {
+            // 初始化位置
+            this.x = randomizeX ? Math.random() * canvas.width : canvas.width + Math.random() * 50;
+            this.y = Math.random() * canvas.height;
+            
+            // 基礎速度 (水平向左偏振)
+            this.baseVx = -(mach * 1.5 + 3);
+            this.vx = this.baseVx;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            
+            this.temp = 0;       // 局部受壓升溫係數 (0 ~ 1)
+            this.isBypassed = false; // 是否已經成功繞過機鼻
+            this.size = Math.random() * 1.8 + 1.2;
+        }
+
+        update() {
+            // 預期流體交互作用中心 (將其設在圓弧形機鼻內部稍微靠左，能拉出極佳的流線弧度)
+            let coreX = ship.x - 10;
+            let coreY = ship.y;
+            
+            let dx = this.x - coreX;
+            let dy = this.y - coreY;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            // 動態震波影響範圍 (速度越快，震波越貼近船體表面)
+            let shockRadius = ship.radius + 75 - (mach * 1.8);
+            if (shockRadius < ship.radius + 15) shockRadius = ship.radius + 15;
+
+            // 完美的粒子分流與流場壓縮邏輯
+            if (this.x > ship.x - 30) { 
+                // 1. 進入震波區：減速並受壓升溫
+                if (dist < shockRadius && dist > ship.radius) {
+                    let compressionFactor = (shockRadius - dist) / (shockRadius - ship.radius);
+                    
+                    // 順著弧度產生分流速度 (向量發散)
+                    let angle = Math.atan2(dy, dx);
+                    
+                    // 前端強烈減速 (動能轉化為熱能的本質)
+                    this.vx = this.baseVx * (1 - compressionFactor * 0.85);
+                    // 側向分流加速
+                    this.vy += Math.sin(angle) * (mach * 0.4) * compressionFactor;
+                    
+                    this.temp = compressionFactor;
+                } 
+                // 2. 離開震波外圍或進入後方：流速逐漸恢復正常
+                else if (dist >= shockRadius) {
+                    this.vx = this.vx * 0.95 + this.baseVx * 0.05;
+                    this.temp *= 0.85; 
+                }
+            } else {
+                // 已越過機鼻前緣，順著艙體兩側平行向後噴洩
+                this.isBypassed = true;
+                this.vx = this.baseVx * 1.2; // 兩側流速因通道變窄而局部加快 (白努利效應模擬)
+                this.temp *= 0.9;            // 膨脹降溫
+            }
+
+            // 3. 邊界剛性防穿透防禦 (當粒子與鈍頭體外殼撞擊時)
+            if (dist <= ship.radius && this.x >= ship.x - 10) {
+                let angle = Math.atan2(dy, dx);
+                this.x = coreX + Math.cos(angle) * (ship.radius + 2);
+                this.y = coreY + Math.sin(angle) * (ship.radius + 2);
+                this.vy = Math.sin(angle) * (mach * 1.2);
+                this.vx = this.baseVx * 0.1; // 撞擊停滯點附近速度驟降
+                this.temp = 1.0;
+            }
+
+            // 進度前進
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // 超出畫布邊界，至右側重置循環
+            if (this.x < 0 || this.y < 0 || this.y > canvas.height) {
+                this.reset();
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            
+            // 精緻的熱力學色彩映射 (冷流藍 -> 壓縮黃 -> 高熱橘紅 -> 電漿白)
+            if (this.temp < 0.15) {
+                ctx.fillStyle = `rgba(59, 130, 246, ${0.25 + density * 0.5})`; // 稀薄大氣原色
+            } else if (this.temp < 0.5) {
+                ctx.fillStyle = `rgba(245, 158, 11, ${0.7 + density * 0.3})`; // 開始受壓
+            } else if (this.temp < 0.82) {
+                ctx.fillStyle = `rgba(239, 68, 68, 0.95)`;                    // 劇烈高溫
+            } else {
+                ctx.fillStyle = `rgba(255, 255, 255, 1)`;                      // 停滯點白熾電漿態
+                if (mach > 12) {
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = "#ef4444";
+                }
+            }
+            ctx.fill();
+            ctx.shadowBlur = 0; // 重置發光效果防止影響整體效能
+        }
+    }
+
+    // 初始化粒子陣列
+    function initParticles() {
+        particles = [];
+        // 動態控制作用中的粒子數，避免低密度時粒子過於擁擠
+        let currentCount = Math.floor(MAX_PARTICLES * (0.3 + density * 0.7));
+        for (let i = 0; i < currentCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    // 箭頭向量繪製函數
+    function drawArrow(fromX, fromY, toX, toY) {
+        let headlen = 7; 
+        let dx = toX - fromX;
+        let dy = toY - fromY;
+        let angle = Math.atan2(dy, dx);
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(toX, toY);
+        ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+    }
+
+    // 繪製太空船艙、震波邊界與科學引線標籤
+    function drawShipAndLabels() {
+        let noseX = ship.x - 10;
+        let noseY = ship.y;
+        
+        // 1. 繪製高溫大氣對流包絡層 (Plasma Glow Layer)
+        // 隨馬赫數與密度增強的前端熱暈效果
+        if (mach > 4) {
+            let glowGrad = ctx.createRadialGradient(ship.x + 30, ship.y, ship.radius, ship.x + 40, ship.y, ship.radius + 50);
+            glowGrad.addColorStop(0, `rgba(239, 68, 68, ${0.4 * density})`);
+            glowGrad.addColorStop(0.4, `rgba(245, 158, 11, ${0.2 * density})`);
+            glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(ship.x + 30, ship.y, ship.radius + 60, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 2. 繪製鈍頭體飛船 (Blunt Body Spaceship)
+        ctx.beginPath();
+        // 前端寬大圓弧機鼻
+        ctx.arc(noseX, noseY, ship.radius, -Math.PI / 2.4, Math.PI / 2.4, false);
+        // 後方收束機身
+        ctx.lineTo(ship.x - ship.length, ship.y + 45);
+        ctx.lineTo(ship.x - ship.length, ship.y - 45);
+        ctx.closePath();
+        ctx.fillStyle = "#2e3440";
+        ctx.strokeStyle = "#434c5e";
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+        
+        // 飛船內艙耐熱板視覺分隔線
+        ctx.beginPath();
+        ctx.arc(noseX, noseY, ship.radius - 8, -Math.PI / 2.4, Math.PI / 2.4, false);
+        ctx.strokeStyle = "#4c566a";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // 飛船標誌符號
+        ctx.fillStyle = "#eceff4";
+        ctx.font = "18px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🛸", ship.x - 50, ship.y + 6);
+
+        // 3. 繪製離體弓形震波線 (Detached Bow Shockwave Line)
+        let shockRadius = ship.radius + 75 - (mach * 1.8);
+        if (shockRadius < ship.radius + 15) shockRadius = ship.radius + 15;
+        
+        ctx.beginPath();
+        ctx.arc(noseX, noseY, shockRadius, -Math.PI / 2.1, Math.PI / 2.1);
+        // 震波線顏色隨強度改變
+        ctx.strokeStyle = mach > 10 ? "rgba(239, 68, 68, 0.6)" : "rgba(148, 163, 184, 0.4)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]); // 還原實線
+
+        // 4. 科學標籤與引線渲染
+        ctx.fillStyle = "rgba(15, 17, 21, 0.85)";
+        ctx.strokeStyle = "#475569";
+        ctx.lineWidth = 1;
+        ctx.font = "11px -apple-system, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // 標籤 A: 弓形震波
+        let lblAx = noseX + shockRadius + 40;
+        let lblAy = noseY - 110;
+        ctx.beginPath();
+        ctx.moveTo(lblAx - 30, lblAy + 10);
+        ctx.lineTo(noseX + Math.cos(-Math.PI/3.5) * shockRadius, noseY + Math.sin(-Math.PI/3.5) * shockRadius);
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.5)";
+        ctx.stroke();
+        
+        ctx.fillStyle = "rgba(15, 17, 21, 0.85)";
+        ctx.beginPath();
+        ctx.roundRect(lblAx - 75, lblAy - 11, 150, 22, 6);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#cbd5e1";
+        ctx.fillText("弓形震波 (BOW SHOCK)", lblAx, lblAy);
+
+        // 標籤 B: 停滯點 (最高溫高壓轉化核心區)
+        let lblBx = noseX + ship.radius + 70;
+        let lblBy = noseY + 40;
+        ctx.beginPath();
+        ctx.moveTo(lblBx - 40, lblBy - 10);
+        ctx.lineTo(noseX + ship.radius, noseY);
+        ctx.strokeStyle = "rgba(239, 68, 68, 0.5)";
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(15, 17, 21, 0.85)";
+        ctx.beginPath();
+        ctx.roundRect(lblBx - 65, lblBy - 11, 130, 22, 6);
+        ctx.fill(); ctx.strokeStyle = "#475569"; ctx.stroke();
+        ctx.fillStyle = "#f87171";
+        ctx.fillText("停滯點 (STAGATION POINT)", lblBx, lblBy);
+
+        // 5. 繪製壓力場向量結構 (開啟時顯示)
+        if (showVectors) {
+            ctx.strokeStyle = "rgba(239, 68, 68, 0.8)";
+            ctx.lineWidth = 1.5;
+            // 向量長度取決於動態衝壓強度
+            let vecLength = Math.min(mach * density * 8, 90); 
+            
+            for (let angle = -Math.PI / 3; angle <= Math.PI / 3; angle += Math.PI / 6) {
+                let startX = noseX + Math.cos(angle) * (ship.radius + vecLength + 8);
+                let startY = noseY + Math.sin(angle) * (ship.radius + vecLength + 8);
+                let targetX = noseX + Math.cos(angle) * (ship.radius + 3);
+                let targetY = noseY + Math.sin(angle) * (ship.radius + 3);
+                drawArrow(startX, startY, targetX, targetY);
+            }
+        }
+    }
+
+    // 主循環動畫
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 依據控制項設定調整當前運作粒子數
+        let targetCount = Math.floor(MAX_PARTICLES * (0.3 + density * 0.7));
+        if (particles.length < targetCount) {
+            particles.push(new Particle());
+        } else if (particles.length > targetCount) {
+            particles.pop();
+        }
+
+        // 粒子物理更新與渲染
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        // 覆蓋繪製船體與UI標示
+        drawShipAndLabels();
+
+        requestAnimationFrame(animate);
+    }
+
+    // 事件監聽器設定
+    sMach.addEventListener('input', (e) => {
+        mach = parseFloat(e.target.value);
+        dMach.innerText = mach;
+        updateStats();
+    });
+
+    sDensity.addEventListener('input', (e) => {
+        density = parseFloat(e.target.value);
+        dDensity.innerText = density.toFixed(2);
+        updateStats();
+    });
+
+    tVectors.addEventListener('change', (e) => {
+        showVectors = e.target.checked;
+    });
+
+    btnReset.addEventListener('click', () => {
+        sMach.value = 5;
+        sDensity.value = 0.5;
+        tVectors.checked = false;
+        
+        mach = 5;
+        density = 0.5;
+        showVectors = false;
+        
+        dMach.innerText = '5';
+        dDensity.innerText = '0.50';
+        
+        initParticles();
+        updateStats();
+    });
+
+    // 核心系統初始化啟動
+    initParticles();
+    updateStats();
+    animate();
+</script>
+
+</body>
+</html>
